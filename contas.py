@@ -1,9 +1,8 @@
-import datetime
+from pydantic import BaseModel
 
 
-class Contas:
+class Contas(BaseModel):
     descricao = ''
-    data_vencimento = datetime.date
-    valor = 0
+    data_vencimento = ' '
+    valor = ' '
     baixado = True
-

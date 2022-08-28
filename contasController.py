@@ -5,26 +5,26 @@ from contas import Contas
 app = FastAPI()
 
 
-@app.post("/cadastrarContas/{descricao}/{data}/{valor}/{baixado}")
-def cadastro_contas(descricao, data, valor, baixado):
+@app.post("/cadastrarContas")
+def cadastro_contas(contas: Contas):
     conexao = mysql.connector.connect(host='localhost', database='contas_a_pagar', user='root', password='root')
     cursor = conexao.cursor()
 
-    if not valor.isnumeric():
-        return "O valor da conta deve ser numérico"
+    if not contas.valor.isdigit():
+        return "O valor deve ser numérico!"
 
-    if baixado.upper() == 'T':
-        baixado = 'T'
-    elif baixado.upper() == 'F':
-        baixado = 'F'
+    if contas.baixado:
+        contas.baixado = 'T'
+    elif not contas.baixado:
+        contas.baixado = 'F'
     else:
         return "O valor de baixado deve ser T ou F"
 
     sql = f"insert into a_pagar (descricao_conta, data_vencimento, valor, baixado) " \
-          f"values ('{descricao}', '{data}', {float(valor)}, '{baixado}') """
+          f"values ('{contas.descricao}', '{contas.data_vencimento}', {float(contas.valor)}, '{contas.baixado}') "
     cursor.execute(sql)
     conexao.commit()
-    return "Conta cadastrada com sucesso", descricao, data, valor, baixado
+    return "Conta cadastrada com sucesso!"
 
 
 @app.get("/consultarContas")
