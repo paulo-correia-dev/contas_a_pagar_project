@@ -252,7 +252,7 @@ def busca_nome_parcial(nome_parcial, response: Response):
                 conta.id = cont1[0]
                 conta.descricao = cont1[1]
                 conta.data_vencimento = cont1[2]
-                conta.valor = [3]
+                conta.valor = cont1[3]
                 conta.baixado = cont1[4]
                 obj_list.append(conta)
 
