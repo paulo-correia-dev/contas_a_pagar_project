@@ -1,15 +1,38 @@
+import secrets
+
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 import http
-from fastapi import FastAPI, Response
+from fastapi import FastAPI, Response, Depends, HTTPException
 import mysql.connector
+from starlette import status
+
 from contas import Contas
 from retornos import Retornos
 
 app = FastAPI()
 retorno_api = Retornos()
+security = HTTPBasic()
 
 
 @app.post("/cadastrarContas", status_code=http.HTTPStatus.CREATED)
-def cadastro_contas(contas: Contas, response: Response):
+def cadastro_contas(contas: Contas, response: Response, credentials: HTTPBasicCredentials = Depends(security)):
+    current_username_bytes = credentials.username.encode("utf8")
+    correct_username_bytes = b"paulo"
+    is_correct_username = secrets.compare_digest(
+        current_username_bytes, correct_username_bytes
+    )
+    current_password_bytes = credentials.password.encode("utf8")
+    correct_password_bytes = b"123"
+    is_correct_password = secrets.compare_digest(
+        current_password_bytes, correct_password_bytes
+    )
+    if not (is_correct_username and is_correct_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+
     conexao = mysql.connector.connect(host='localhost', database='contas_a_pagar', user='root', password='root')
     cursor = conexao.cursor()
 
